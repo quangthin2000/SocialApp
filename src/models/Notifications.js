@@ -3,12 +3,25 @@ const Schema = mongoose.Schema;
 
 const NotificationSchema = new Schema(
   {
-    userId: {
+    fromUserId: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
-    
+    toUserId:{
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    postId:{
+      type: Schema.Types.ObjectId,
+      ref: "post",
+      required: true
+    },
+    isRead:{
+      type: Boolean,
+      default: false
+    },
   },
   {
     timestamps: true,

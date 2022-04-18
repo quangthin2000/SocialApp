@@ -12,7 +12,10 @@ function verify(req, res) {
       })
     });
   } else {
-    return res.status(401).json("You are not authenticated");
+    return res.json({
+      status:456,
+      error:"Bạn không có quyền truy cập"
+    });
   }
 }
 

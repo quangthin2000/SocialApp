@@ -1,5 +1,7 @@
 const Comment = require("../models/Comment");
 const isExpired = require("../../utils/checkExpires");
+const Post = require("../models/Post")
+const Notification = require('../models/Notifications')
 class CommentController {
   /*
    * @POST: comment/
@@ -21,7 +23,17 @@ class CommentController {
         userId: req.user.userId,
         postId: postId,
       });
-      await newComment.save();
+      const post = await Post.findById(postId)
+      post.comments.push(newComment._id)
+      const notification = new Notification({
+        fromUserId: req.user.userId,
+        
+        toUserId: post.userId,
+        postId: post._id
+      })
+      await post.save()
+      await newComment.save()
+      await notification.save()
       return res.json({
         data: newComment,
         msg: "Bình luận thành công",

@@ -16,8 +16,12 @@ const PostSchema = new Schema(
             ref: "user",
         },
         likes: {
-            type: Number,
-            default: 0
+            type: Schema.Types.Array,
+            default: []
+        },
+        comments: {
+            type: Schema.Types.Array,
+            default: []
         }
     },
     {

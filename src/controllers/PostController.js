@@ -1,7 +1,6 @@
 const Post = require("../models/Post");
 const isExpired = require("../../utils/checkExpires");
 
-
 class PostController {
   /*
    * @POST: post/
@@ -18,7 +17,7 @@ class PostController {
     try {
       const { content, photo } = req.body;
       if (!content || !photo) {
-        return res.status(5400).json({
+        return res.status(400).json({
           error: "Vui lòng điền đầy đủ thông tin",
         });
       }
@@ -48,7 +47,11 @@ class PostController {
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
-    const posts = await Post.find({}).populate('userId', ['fullName', 'email', 'isAdmin']);
+    const posts = await Post.find({}).populate("userId", [
+      "fullName",
+      "email",
+      "isAdmin",
+    ]);
     if (posts.length > 0) {
       return res.json({
         data: posts,
@@ -73,7 +76,9 @@ class PostController {
       });
     }
     const id = req.params.id;
-    const post = await Post.findById(id).populate('userId', ['fullName', 'email', 'isAdmin']).sort({_id: 1});
+    const post = await Post.findById(id)
+      .populate("userId", ["fullName", "email", "isAdmin"])
+      .sort({ _id: 1 });
     if (post) {
       return res.json({
         data: post,
@@ -154,8 +159,24 @@ class PostController {
       });
     }
   }
-  async like(req, res){
-
+  async like(req, res) {
+    if (!isExpired(req, res)) {
+      return res.json({
+        status: 456,
+        error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
+      });
+    }
+    const postId = req.params.id;
+    Post.findByIdAndUpdate(postId, {
+      $push: { likes: req.user.userId },
+      function(err, data) {
+        if (err)
+          return res.status(400).json({
+            msg: "Lỗi",
+          });
+        return console.log("Like by " + req.user.fullName);
+      },
+    });
   }
 }
 
