@@ -9,8 +9,7 @@ class PostController {
    */
   async create(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -42,16 +41,13 @@ class PostController {
    */
   async showAll(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
-    const posts = await Post.find({}).populate("userId", [
-      "fullName",
-      "email",
-      "isAdmin",
-    ]);
+    const posts = await Post.find({})
+      .populate("userId", ["fullName", "email", "isAdmin"])
+      .sort({ createdAt: "desc" });
     if (posts.length > 0) {
       return res.json({
         data: posts,
@@ -70,8 +66,7 @@ class PostController {
    */
   async show(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -97,18 +92,20 @@ class PostController {
    */
   async edit(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
     const id = req.params.id;
     const post = await Post.findOne({ _id: id });
-    if (post.userId.toString() !== req.user.userId) {
-      return res.status(401).json({
-        error: "Bạn không có quyền sửa bài viết này",
-      });
+    if (!req.user.isAdmin) {
+      if (post.userId.toString() !== req.user.userId) {
+        return res.status(401).json({
+          error: "Bạn không có quyền sửa bài viết này",
+        });
+      }
     }
+
     try {
       const updatedPost = await Post.findByIdAndUpdate(
         id,
@@ -136,17 +133,18 @@ class PostController {
    */
   async destroy(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
     const id = req.params.id;
     const post = await Post.findOne({ _id: id });
-    if (post.userId.toString() !== req.user.userId) {
-      return res.status(401).json({
-        error: "Bạn không có quyền sửa bài viết này",
-      });
+    if (!req.user.isAdmin) {
+      if (post.userId.toString() !== req.user.userId) {
+        return res.status(401).json({
+          error: "Bạn không có quyền sửa bài viết này",
+        });
+      }
     }
     try {
       await Post.findByIdAndDelete(id);
@@ -161,22 +159,36 @@ class PostController {
   }
   async like(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
-    const postId = req.params.id;
-    Post.findByIdAndUpdate(postId, {
-      $push: { likes: req.user.userId },
-      function(err, data) {
-        if (err)
-          return res.status(400).json({
-            msg: "Lỗi",
-          });
-        return console.log("Like by " + req.user.fullName);
-      },
-    });
+    try {
+      const postId = req.params.id;
+      const post = await Post.findById(postId);
+      const userId = req.user.userId;
+      const postLikeObject = post.likes;
+      if (postLikeObject.includes(userId)) {
+        postLikeObject.remove(userId);
+        await post.save();
+        return res.json({
+          data: post,
+          msg: "Dislike thành công",
+        });
+      } else {
+        postLikeObject.unshift(userId);
+        await post.save();
+        return res.json({
+          data: post,
+          msg: "Like thành công",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        msg: "Lỗi server",
+      });
+    }
   }
 }
 

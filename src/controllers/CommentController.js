@@ -10,8 +10,7 @@ class CommentController {
    */
   async create(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -25,15 +24,8 @@ class CommentController {
       });
       const post = await Post.findById(postId)
       post.comments.push(newComment._id)
-      const notification = new Notification({
-        fromUserId: req.user.userId,
-        
-        toUserId: post.userId,
-        postId: post._id
-      })
       await post.save()
       await newComment.save()
-      await notification.save()
       return res.json({
         data: newComment,
         msg: "Bình luận thành công",
@@ -52,8 +44,7 @@ class CommentController {
    */
   async showCommentByPost(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -66,8 +57,8 @@ class CommentController {
           msg: "Hiển thị thành công",
         });
       } else {
-        return res.status(400).json({
-          msg: "Không có bình luận nào",
+        return res.status(200).json({
+          data: []
         });
       }
     } catch (error) {
@@ -82,8 +73,7 @@ class CommentController {
    */
   async edit(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -122,22 +112,18 @@ class CommentController {
    */
   async destroy(req, res) {
     if (!isExpired(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
 
     const id = req.params.id;
     const comment = await Comment.findOne({ _id: id });
-    if (!comment) {
-      return res.status(404).json("Comment không tồn tại");
-    }
 
     if (comment.userId.toString() !== req.user.userId)
       return res.status(401).json("Bạn không có quyển xóa comment");
     try {
-      await Comment.findByIdAndDelete(id);
+      await Comment.findOneAndDelete({ _id: id });
       return res.status(200).json({
         msg: "Xóa thành công",
       });

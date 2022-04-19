@@ -6,8 +6,7 @@ class UserController {
   async create(req, res) {
     console.log(checkExpires(req, res));
     if (!checkExpires(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -32,8 +31,7 @@ class UserController {
 
   async update(req, res) {
     if (!checkExpires(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -66,8 +64,7 @@ class UserController {
   }
   async delete(req, res) {
     if (!checkExpires(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }
@@ -82,8 +79,7 @@ class UserController {
   }
   async show(req, res) {
     if (!checkExpires(req, res)) {
-      return res.json({
-        status: 456,
+      return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",
       });
     }

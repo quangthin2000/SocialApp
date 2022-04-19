@@ -109,7 +109,7 @@ class AuthController {
           isVerified: user.isVerified,
         },
         process.env.SECRET_KEY,
-        { expiresIn: 1800 }
+        { expiresIn: 7200 }
       );
 
       const { password, ...info } = user._doc;
