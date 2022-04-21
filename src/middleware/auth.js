@@ -8,7 +8,7 @@ function verify(req, res, next) {
     jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) return res.status(403).json("Token is not valid");
       req.user = user;
-      console.log(req.user)
+      // console.log(req.user)
       next()
     });
   } else {

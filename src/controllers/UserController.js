@@ -4,7 +4,7 @@ const checkExpires = require("../../utils/checkExpires");
 const verifyToken = require('../../utils/verifyToken')
 class UserController {
   async create(req, res) {
-    console.log(checkExpires(req, res));
+    // console.log(checkExpires(req, res));
     if (!checkExpires(req, res)) {
       return res.status(456).json({
         error: "Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại",

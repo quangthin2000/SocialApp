@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 function isJwtExpired(req, res) {
   try {
     const headers = req.headers.authorization;
-    console.log(headers)
+    // console.log(headers)
     if (headers) {
       const token = headers.split(" ")[1];
       const decode = jwt.verify(token, process.env.SECRET_KEY);

@@ -1,7 +1,7 @@
 const Comment = require("../models/Comment");
 const isExpired = require("../../utils/checkExpires");
 const Post = require("../models/Post")
-const Notification = require('../models/Notifications')
+
 class CommentController {
   /*
    * @POST: comment/
@@ -16,7 +16,7 @@ class CommentController {
     }
     try {
       const { content, postId } = req.body;
-      console.log(req.body);
+      // console.log(req.body);
       const newComment = new Comment({
         content,
         userId: req.user.userId,
@@ -31,7 +31,7 @@ class CommentController {
         msg: "Bình luận thành công",
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return res.status(500).json({
         msg: "Lỗi server",
       });
@@ -86,8 +86,8 @@ class CommentController {
     if (comment.userId.toString() !== req.user.userId)
       return res.status(401).json("Bạn không có quyển sửa comment");
     try {
-      const updatedComment = await Comment.findByIdAndUpdate(
-        id,
+      const updatedComment = await Comment.findOneAndUpdate(
+        {_id:id},
         {
           $set: req.body,
         },

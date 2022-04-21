@@ -91,7 +91,7 @@ class AuthController {
       if (user.isVerified === 0) {
         res.status(401).json({ msg: "Vui lòng xác thực email" });
       }
-      console.log(user)
+
       if (!user) {
         return res.status(400).json({ msg: "Sai email hoặc mật khẩu" });
       }

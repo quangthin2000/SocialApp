@@ -19,7 +19,7 @@ class NotificationController {
     });
     try {
       await notification.save();
-      console.log(notification);
+      // console.log(notification);
       return res.json({
         data: notification,
         msg: "Thêm thành công",
@@ -38,7 +38,7 @@ class NotificationController {
       });
     }
 
-    const notifications = await Notification.find({ toUserId: req.user.userId })
+    const notifications = await Notification.find({ toUserId: req.user.userId }).sort({createdAt: 'desc'})
       .populate("fromUserId")
       .populate("toUserId")
       .populate("postId");

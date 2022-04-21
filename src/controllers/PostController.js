@@ -47,6 +47,14 @@ class PostController {
     }
     const posts = await Post.find({})
       .populate("userId", ["fullName", "email", "isAdmin"])
+      .populate({
+        path: "comments",
+        select: ["userId", "content"],
+        populate: {
+          path: "userId",
+          select: "fullName"
+        },
+      })
       .sort({ createdAt: "desc" });
     if (posts.length > 0) {
       return res.json({
@@ -171,14 +179,14 @@ class PostController {
       if (postLikeObject.includes(userId)) {
         postLikeObject.remove(userId);
         await post.save();
-        return res.json({
+        return res.status(201).json({
           data: post,
           msg: "Dislike thành công",
         });
       } else {
         postLikeObject.unshift(userId);
         await post.save();
-        return res.json({
+        return res.status(200).json({
           data: post,
           msg: "Like thành công",
         });
